@@ -41,3 +41,4 @@ sample
 
 # compiler temp file
 build/
+lib/

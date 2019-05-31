@@ -2,8 +2,6 @@ cmake_minimum_required (VERSION 2.6)
 
 project(pod_pb)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -DNDEBUG")
-
 file(GLOB proto_file_list ${POD_PROTO}/*.proto)
 foreach(proto_file ${proto_file_list})
     execute_process(COMMAND ${PROTOC_TOOL} --proto_path=${POD_PROTO} --proto_path=${PROTOBUF_DIR} --cpp_out=${POD_PROTO} ${proto_file} RESULT_VARIABLE retcode)

@@ -9,11 +9,14 @@ include_directories(${PROJECT_SOURCE_DIR}
     ${POD_PROTO}
     )
 
+link_directories(${PROTOBUF_LIB})
+
 add_executable(${PROJECT_NAME} ${SOURCE})
 
 target_link_libraries(${PROJECT_NAME} 
-    ${PROTOBUF_LIB}/libprotoc.a
-    ${PROTOBUF_LIB}/libprotobuf.a
+    protoc
+    protobuf
+    pthread
     ${POD_LIB}/libpod_pb.a
     )
 

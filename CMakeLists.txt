@@ -23,8 +23,8 @@ endif()
 
 SET(POD_PLUGIN_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-#todo
-SET(PROTOBUF_ROOT_DIR ${POD_PLUGIN_ROOT_DIR}/../../open_source/protobuf/)
+# can use your own protobuf directory here
+SET(PROTOBUF_ROOT_DIR ${POD_PLUGIN_ROOT_DIR}/third_party/protobuf/)
 SET(PROTOBUF_DIR ${PROTOBUF_ROOT_DIR}/src/)
 SET(PROTOC_TOOL ${PROTOBUF_DIR}/protoc)
 SET(PROTOBUF_LIB ${PROTOBUF_DIR}/.libs/)
@@ -32,10 +32,7 @@ SET(PROTOBUF_LIB ${PROTOBUF_DIR}/.libs/)
 SET(POD_PROTO ${POD_PLUGIN_ROOT_DIR}/proto)
 SET(POD_LIB ${POD_PLUGIN_ROOT_DIR}/lib)
 
-#SET(CMAKE_C_COMPILER "/usr/local/bin/gcc")
-#SET(CMAKE_CXX_COMPILER "/usr/local/bin/g++")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC -std=c++14 -Wno-literal-suffix -Wno-error=literal-suffix -Wno-deprecated -Wno-unused-variable -Wno-sign-compare -Wno-strict-aliasing -fno-strict-aliasing")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -fPIC -std=c++11 -O2")
 
 ADD_SUBDIRECTORY(proto)
 ADD_SUBDIRECTORY(src)
