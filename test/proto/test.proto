@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+import "pod_options.proto";
+
+package Test;
+
+enum RootEnum
+{
+    ROOT_ONE = 1;
+    ROOT_TWO = 2;
+}
+
+message BaseMsg
+{
+    enum NestedEnum
+    {
+        NESTED_ONE = 1;
+        NESTED_TWO = 2;
+        NESTED_THREE = 3;
+    }
+
+    message NestedMsg
+    {
+        option (gen_pod) = 1;
+        optional uint32 id = 1;
+        optional uint32 sex = 2;
+    }
+
+    option (gen_pod) = 1;
+    required uint64 id = 1 [(int_type) = UINT16, default = 0];
+    optional bool is_value = 2;
+    repeated uint32 index = 3 [(int_type) = UINT8, (max_count) = 10];
+    optional string mail = 4;
+    optional RootEnum root_enum = 5;
+    optional NestedEnum nested_enum = 6;
+    repeated NestedMsg nested_msg = 7 [(fixed_max_count) = 5];
+}

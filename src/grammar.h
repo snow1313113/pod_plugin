@@ -75,8 +75,10 @@ struct MessageStruct : public BaseStruct
     virtual bool ImplStr(stringstream& ss_, const string& prefix_) const final;
 
 private:
+    void ClearDeclareStr(stringstream& ss_, const string& prefix_) const;
     void FromPbDeclareStr(stringstream& ss_, const string& prefix_) const;
     void ToPbDeclareStr(stringstream& ss_, const string& prefix_) const;
+    void ClearImplStr(stringstream& ss_, const string& prefix_) const;
     void FromPbImplStr(stringstream& ss_, const string& prefix_) const;
     void ToPbImplStr(stringstream& ss_, const string& prefix_) const;
 };
@@ -118,6 +120,15 @@ struct Field
     void GetArrayMessageStr(stringstream& ss_, const string& prefix_) const;
     void GetFixedArrayMessageStr(stringstream& ss_, const string& prefix_) const;
     void GetStringStr(stringstream& ss_, const string& prefix_) const;
+
+    void InitStr(stringstream& ss_, const string& prefix_) const;
+    void InitSingleVarStr(stringstream& ss_, const string& prefix_) const;
+    void InitSingleMessageStr(stringstream& ss_, const string& prefix_) const;
+    void InitArrayVarStr(stringstream& ss_, const string& prefix_) const;
+    void InitFixedArrayVarStr(stringstream& ss_, const string& prefix_) const;
+    void InitArrayMessageStr(stringstream& ss_, const string& prefix_) const;
+    void InitFixedArrayMessageStr(stringstream& ss_, const string& prefix_) const;
+    void InitStringStr(stringstream& ss_, const string& prefix_) const;
 };
 
 struct SyntaxTree

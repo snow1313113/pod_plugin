@@ -24,11 +24,17 @@ bool MessageStruct::DeclareStr(stringstream& ss_, const string& prefix_) const
         field->DeclareStr(ss_, prefix_ + g_indent);
 
     ss_ << "\n";
+    ClearDeclareStr(ss_, prefix_ + g_indent);
     FromPbDeclareStr(ss_, prefix_ + g_indent);
     ToPbDeclareStr(ss_, prefix_ + g_indent);
 
     ss_ << prefix_ << "};\n";
     return true;
+}
+
+void MessageStruct::ClearDeclareStr(stringstream& ss_, const string& prefix_) const
+{
+    ss_ << prefix_ << "void Clear();\n";
 }
 
 void MessageStruct::FromPbDeclareStr(stringstream& ss_, const string& prefix_) const
@@ -49,10 +55,21 @@ bool MessageStruct::ImplStr(stringstream& ss_, const string& prefix_) const
             ss_ << "\n";
     }
 
+    ClearImplStr(ss_, prefix_);
+    ss_ << "\n";
     FromPbImplStr(ss_, prefix_);
     ss_ << "\n";
     ToPbImplStr(ss_, prefix_);
     return true;
+}
+
+void MessageStruct::ClearImplStr(stringstream& ss_, const string& prefix_) const
+{
+    ss_ << prefix_ << "void " << full_name << "::Clear()\n";
+    ss_ << prefix_ << "{\n";
+    for (auto field : fields)
+        field->InitStr(ss_, prefix_ + g_indent);
+    ss_ << prefix_ << "}\n";
 }
 
 void MessageStruct::FromPbImplStr(stringstream& ss_, const string& prefix_) const
@@ -286,6 +303,62 @@ void Field::GetStringStr(stringstream& ss_, const string& prefix_) const
     ss_ << prefix_ << g_indent << g_indent << "return false;\n";
     ss_ << prefix_ << g_indent << "msg_." << name << "().copy(" << name << ", msg_." << name << "().length());\n";
     ss_ << prefix_ << "}\n";
+}
+
+void Field::InitStr(stringstream& ss_, const string& prefix_) const
+{
+    assert(type_message);
+    if (type_message->msg_type == MSG_TYPE::STRING)
+        InitStringStr(ss_, prefix_);
+    else if (type_message->msg_type == MSG_TYPE::STRUCT)
+    {
+        if (len == 0)
+            InitSingleMessageStr(ss_, prefix_);
+        else if (fixed_len)
+            InitFixedArrayMessageStr(ss_, prefix_);
+        else
+            InitArrayMessageStr(ss_, prefix_);
+    }
+    else
+    {
+        if (len == 0)
+            InitSingleVarStr(ss_, prefix_);
+        else if (fixed_len)
+            InitFixedArrayVarStr(ss_, prefix_);
+        else
+            InitArrayVarStr(ss_, prefix_);
+    }
+}
+
+void Field::InitSingleVarStr(stringstream& ss_, const string& prefix_) const
+{
+    // todo if is enum or bool?
+    ss_ << prefix_ << name << " = 0;\n";
+}
+
+void Field::InitSingleMessageStr(stringstream& ss_, const string& prefix_) const
+{
+    ss_ << prefix_ << name << ".Clear();\n";
+}
+
+void Field::InitArrayVarStr(stringstream& ss_, const string& prefix_) const
+{
+}
+
+void Field::InitFixedArrayVarStr(stringstream& ss_, const string& prefix_) const
+{
+}
+
+void Field::InitArrayMessageStr(stringstream& ss_, const string& prefix_) const
+{
+}
+
+void Field::InitFixedArrayMessageStr(stringstream& ss_, const string& prefix_) const
+{
+}
+
+void Field::InitStringStr(stringstream& ss_, const string& prefix_) const
+{
 }
 
 }  // namespace Pepper

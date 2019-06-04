@@ -38,6 +38,8 @@ sample
 # Protobuf c++ file
 *.pb.h
 *.pb.cc
+*.pod.h
+*.pod.cc
 
 # compiler temp file
 build/
