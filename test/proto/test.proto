@@ -27,11 +27,11 @@ message BaseMsg
     }
 
     option (gen_pod) = 1;
-    required uint64 id = 1 [(int_type) = UINT16, default = 0];
-    optional bool is_value = 2;
+    required uint64 id = 1 [(int_type) = UINT16, default = 100];
+    optional bool is_value = 2 [default = true];
     repeated uint32 index = 3 [(int_type) = UINT8, (max_count) = 10];
     optional string mail = 4;
-    optional RootEnum root_enum = 5;
-    optional NestedEnum nested_enum = 6;
+    optional RootEnum root_enum = 5 [default = ROOT_TWO];
+    optional NestedEnum nested_enum = 6 [default = NESTED_TWO];
     repeated NestedMsg nested_msg = 7 [(fixed_max_count) = 5];
 }

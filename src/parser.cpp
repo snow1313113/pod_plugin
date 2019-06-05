@@ -66,35 +66,6 @@ const BuiltInStruct *real_type_message(INT_TYPE type_)
     }
 }
 
-const BuiltInStruct *cpp_type_2_message(FieldDescriptor::CppType type_)
-{
-    switch (type_)
-    {
-        case FieldDescriptor::CPPTYPE_INT32:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::INT32)];
-        case FieldDescriptor::CPPTYPE_INT64:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::INT64)];
-        case FieldDescriptor::CPPTYPE_UINT32:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::UINT32)];
-        case FieldDescriptor::CPPTYPE_UINT64:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::UINT64)];
-        case FieldDescriptor::CPPTYPE_DOUBLE:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::DOUBLE)];
-        case FieldDescriptor::CPPTYPE_FLOAT:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::FLOAT)];
-        case FieldDescriptor::CPPTYPE_BOOL:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::BOOL)];
-        case FieldDescriptor::CPPTYPE_ENUM:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::ENUM)];
-        case FieldDescriptor::CPPTYPE_STRING:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::CHAR)];
-        case FieldDescriptor::CPPTYPE_MESSAGE:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::STRUCT)];
-        default:
-            return g_builtin[static_cast<size_t>(FIELD_TYPE::UNKNOW)];
-    }
-}
-
 //////////////////////////////////////////////////
 
 PodMessage::~PodMessage()
@@ -251,21 +222,57 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
     switch (desc_->cpp_type())
     {
         case FieldDescriptor::CPPTYPE_INT32:
+        {
+            if (desc_->options().HasExtension(int_type))
+                f->type_message = real_type_message(desc_->options().GetExtension(int_type));
+            else
+                f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::INT32)];
+            f->default_value = std::to_string(desc_->default_value_int32());
+            break;
+        }
         case FieldDescriptor::CPPTYPE_INT64:
+        {
+            if (desc_->options().HasExtension(int_type))
+                f->type_message = real_type_message(desc_->options().GetExtension(int_type));
+            else
+                f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::INT64)];
+            f->default_value = std::to_string(desc_->default_value_int64());
+            break;
+        }
         case FieldDescriptor::CPPTYPE_UINT32:
+        {
+            if (desc_->options().HasExtension(int_type))
+                f->type_message = real_type_message(desc_->options().GetExtension(int_type));
+            else
+                f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::UINT32)];
+            f->default_value = std::to_string(desc_->default_value_uint32());
+            break;
+        }
         case FieldDescriptor::CPPTYPE_UINT64:
         {
             if (desc_->options().HasExtension(int_type))
                 f->type_message = real_type_message(desc_->options().GetExtension(int_type));
             else
-                f->type_message = cpp_type_2_message(desc_->cpp_type());
+                f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::UINT64)];
+            f->default_value = std::to_string(desc_->default_value_uint64());
             break;
         }
         case FieldDescriptor::CPPTYPE_BOOL:
+        {
+            f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::BOOL)];
+            f->default_value = desc_->default_value_bool() ? "true" : "false";
+            break;
+        }
         case FieldDescriptor::CPPTYPE_DOUBLE:
+        {
+            f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::DOUBLE)];
+            f->default_value = std::to_string(desc_->default_value_double());
+            break;
+        }
         case FieldDescriptor::CPPTYPE_FLOAT:
         {
-            f->type_message = cpp_type_2_message(desc_->cpp_type());
+            f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::FLOAT)];
+            f->default_value = std::to_string(desc_->default_value_float());
             break;
         }
         case FieldDescriptor::CPPTYPE_STRING:
@@ -283,7 +290,8 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
                 f->len = 1;
 
             f->fixed_len = true;
-            f->type_message = cpp_type_2_message(desc_->cpp_type());
+            f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::CHAR)];
+            f->default_value = desc_->default_value_string();
             break;
         }
         case FieldDescriptor::CPPTYPE_ENUM:
@@ -297,6 +305,12 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             }
 
             f->type_message = it->second;
+            auto enum_struct = static_cast<const EnumStruct *>(f->type_message);
+            assert(enum_struct);
+            if (enum_struct->parent_message)
+                f->default_value = enum_struct->parent_message->pb_full_name + "::" + desc_->default_value_enum()->name();
+            else
+                f->default_value = f->type_message->name + "::" + desc_->default_value_enum()->name();
             break;
         }
         case FieldDescriptor::CPPTYPE_MESSAGE:
@@ -310,6 +324,7 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             }
 
             f->type_message = it->second;
+            f->default_value = "";
             break;
         }
         default:
@@ -347,6 +362,7 @@ EnumStruct *PodMessage::ParseEnum(const ::google::protobuf::EnumDescriptor *desc
 {
     std::unique_ptr<EnumStruct> e(new EnumStruct);
     e->name = desc_->name();
+    e->parent_message = parent_;
 
     auto parent_desc = desc_->containing_type();
     if ((parent_desc && !parent_) || (!parent_desc && parent_))

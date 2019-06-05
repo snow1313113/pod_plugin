@@ -24,11 +24,15 @@ endif()
 SET(POD_PLUGIN_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 # can use your own protobuf directory here
-#SET(PROTOBUF_ROOT_DIR ${POD_PLUGIN_ROOT_DIR}/../../open_source/protobuf)
 SET(PROTOBUF_ROOT_DIR ${POD_PLUGIN_ROOT_DIR}/third_party/protobuf)
 SET(PROTOBUF_DIR ${PROTOBUF_ROOT_DIR}/src/)
 SET(PROTOC_TOOL ${PROTOBUF_DIR}/protoc)
 SET(PROTOBUF_LIB ${PROTOBUF_DIR}/.libs/)
+
+# can use your own googletest directory here
+SET(GTEST_ROOT ${POD_PLUGIN_ROOT_DIR}/third_party/googletest)
+SET(GTEST_INCLUDE ${GTEST_ROOT}/googletest/include)
+SET(GTEST_LIB ${GTEST_ROOT}/build/lib)
 
 SET(POD_PROTO ${POD_PLUGIN_ROOT_DIR}/proto)
 SET(POD_LIB ${POD_PLUGIN_ROOT_DIR}/lib)

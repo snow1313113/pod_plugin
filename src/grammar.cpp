@@ -96,7 +96,12 @@ void Field::DeclareStr(stringstream& ss_, const string& prefix_) const
 {
     assert(type_message);
     if (len == 0)
-        ss_ << prefix_ << type_message->name << " " << name << ";\n";
+    {
+        if (default_value.empty())
+            ss_ << prefix_ << type_message->name << " " << name << ";\n";
+        else
+            ss_ << prefix_ << type_message->name << " " << name << " = " << default_value << ";\n";
+    }
     else if (len <= 0xFF)
     {
         string max_len_name = string("max_") + name + string("_count");
@@ -332,8 +337,7 @@ void Field::InitStr(stringstream& ss_, const string& prefix_) const
 
 void Field::InitSingleVarStr(stringstream& ss_, const string& prefix_) const
 {
-    // todo if is enum or bool?
-    ss_ << prefix_ << name << " = 0;\n";
+    ss_ << prefix_ << name << " = " << default_value << ";\n";
 }
 
 void Field::InitSingleMessageStr(stringstream& ss_, const string& prefix_) const

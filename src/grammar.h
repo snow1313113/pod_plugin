@@ -54,8 +54,11 @@ struct BuiltInStruct : public BaseStruct
     virtual bool ImplStr(stringstream& ss_, const string& prefix_) const final{return false;};
 };
 
+struct MessageStruct;
 struct EnumStruct : public BaseStruct
 {
+    const MessageStruct* parent_message = nullptr;
+
     EnumStruct() : BaseStruct{"", "", MSG_TYPE::ENUM} {}
     virtual ~EnumStruct() = default;
     virtual bool DeclareStr(stringstream& ss_, const string& prefix_) const final{return false;};
@@ -97,6 +100,7 @@ struct UnknowStruct : public BaseStruct
 struct Field
 {
     string name;
+    string default_value;
     size_t len = 0;
     bool fixed_len = false;
     const BaseStruct* type_message = nullptr;
