@@ -292,6 +292,10 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             f->fixed_len = true;
             f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::CHAR)];
             f->default_value = desc_->default_value_string();
+            if (f->default_value.empty())
+                f->default_value = "{0}";
+            else
+                f->default_value = string("\"") + f->default_value + "\"";
             break;
         }
         case FieldDescriptor::CPPTYPE_ENUM:
@@ -342,6 +346,9 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
 
     if (desc_->is_repeated())
     {
+        if (!(f->default_value.empty()))
+            f->default_value = string("{") + f->default_value + "}";
+
         if (desc_->options().HasExtension(max_count))
         {
             f->len = desc_->options().GetExtension(max_count);

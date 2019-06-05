@@ -102,37 +102,38 @@ void Field::DeclareStr(stringstream& ss_, const string& prefix_) const
         else
             ss_ << prefix_ << type_message->name << " " << name << " = " << default_value << ";\n";
     }
-    else if (len <= 0xFF)
-    {
-        string max_len_name = string("max_") + name + string("_count");
-        ss_ << prefix_ << "static const uint8_t " << max_len_name << " = " << len << ";\n";
-        if (!fixed_len)
-            ss_ << prefix_ << "uint8_t " << name << "_count;\n";
-        ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
-    }
-    else if (len <= 0xFFFF)
-    {
-        string max_len_name = string("max_") + name + string("_count");
-        ss_ << prefix_ << "static const uint16_t " << max_len_name << " = " << len << ";\n";
-        if (!fixed_len)
-            ss_ << prefix_ << "uint16_t " << name << "_count;\n";
-        ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
-    }
-    else if (len <= 0xFFFFFFFF)
-    {
-        string max_len_name = string("max_") + name + string("_count");
-        ss_ << prefix_ << "static const uint32_t " << max_len_name << " = " << len << ";\n";
-        if (!fixed_len)
-            ss_ << prefix_ << "uint32_t " << name << "_count;\n";
-        ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
-    }
     else
     {
         string max_len_name = string("max_") + name + string("_count");
-        ss_ << prefix_ << "static const uint64_t " << max_len_name << " = " << len << ";\n";
-        if (!fixed_len)
-            ss_ << prefix_ << "uint64_t " << name << "_count;\n";
-        ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
+        if (len <= 0xFF)
+        {
+            ss_ << prefix_ << "static const uint8_t " << max_len_name << " = " << len << ";\n";
+            if (!fixed_len)
+                ss_ << prefix_ << "uint8_t " << name << "_count;\n";
+        }
+        else if (len <= 0xFFFF)
+        {
+            ss_ << prefix_ << "static const uint16_t " << max_len_name << " = " << len << ";\n";
+            if (!fixed_len)
+                ss_ << prefix_ << "uint16_t " << name << "_count;\n";
+        }
+        else if (len <= 0xFFFFFFFF)
+        {
+            ss_ << prefix_ << "static const uint32_t " << max_len_name << " = " << len << ";\n";
+            if (!fixed_len)
+                ss_ << prefix_ << "uint32_t " << name << "_count;\n";
+        }
+        else
+        {
+            ss_ << prefix_ << "static const uint64_t " << max_len_name << " = " << len << ";\n";
+            if (!fixed_len)
+                ss_ << prefix_ << "uint64_t " << name << "_count;\n";
+        }
+
+        if (default_value.empty())
+            ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
+        else
+            ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = " << default_value << ";\n";
     }
 }
 

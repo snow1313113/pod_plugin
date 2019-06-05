@@ -12,15 +12,15 @@ enum RootEnum
 
 message BaseMsg
 {
-    enum NestedEnum
-    {
-        NESTED_ONE = 1;
-        NESTED_TWO = 2;
-        NESTED_THREE = 3;
-    }
-
     message NestedMsg
     {
+        enum NestedEnum
+        {
+            NESTED_ONE = 1;
+            NESTED_TWO = 2;
+            NESTED_THREE = 3;
+        }
+
         option (gen_pod) = 1;
         optional uint32 id = 1;
         optional uint32 sex = 2;
@@ -28,10 +28,23 @@ message BaseMsg
 
     option (gen_pod) = 1;
     required uint64 id = 1 [(int_type) = UINT16, default = 100];
-    optional bool is_value = 2 [default = true];
-    repeated uint32 index = 3 [(int_type) = UINT8, (max_count) = 10];
-    optional string mail = 4;
-    optional RootEnum root_enum = 5 [default = ROOT_TWO];
-    optional NestedEnum nested_enum = 6 [default = NESTED_TWO];
-    repeated NestedMsg nested_msg = 7 [(fixed_max_count) = 5];
+    optional int64 id_without_default = 2;
+
+    optional bool is_value = 3 [default = true];
+    optional bool is_without_default = 4;
+
+    optional double float_num = 5 [default = 1.0];
+    optional double float_num_without_default = 6;
+
+    repeated uint32 indexs = 7 [(int_type) = INT8, (max_count) = 10];
+    repeated uint32 fixed_indexs = 8 [(int_type) = INT16, (fixed_max_count) = 5];
+
+    optional string str = 9 [(str_len) = 10, default = "hello"];
+    optional string str_without_default = 10;
+
+    repeated NestedMsg nested_msg = 11 [(fixed_max_count) = 5];
+
+    optional RootEnum root_enum = 12 [default = ROOT_TWO];
+    optional NestedMsg.NestedEnum nested_enum = 13 [default = NESTED_TWO];
+    optional NestedMsg.NestedEnum nested_enum_without_defalut = 14;
 }
