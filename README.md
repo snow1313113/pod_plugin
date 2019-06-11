@@ -23,6 +23,9 @@ Add-ons for Protocol Buffers, it change proto message to c struct
 
  protoc --proto_path=*your path* --pod_out=*output path* --plugin=protoc-gen-pod=pod_plugin *proto file*
 
+ there is some options that can specify c++ standard of gen code
+ use *--pod_opt=c++98* or *--pod_opt=c++11*
+
 ## Build gtest case
 
 ```sh

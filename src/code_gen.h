@@ -36,7 +36,7 @@ public:
         if (!pod_msg.HasPodMessage())
             return true;
 
-        if (!pod_msg.Parse())
+        if (!pod_msg.Parse(parameter))
         {
             *error = pod_msg.err_msg();
             return false;

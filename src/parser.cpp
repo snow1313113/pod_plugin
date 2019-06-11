@@ -21,7 +21,6 @@ namespace Pepper
 
 string base_name(const string &str_)
 {
-    vector<string> res;
     stringstream input(str_);
     string temp;
     std::getline(input, temp, '.');
@@ -110,10 +109,16 @@ void PodMessage::InitBaseMessage()
     g_builtin[static_cast<size_t>(FIELD_TYPE::STRUCT)] = nullptr;
 }
 
-bool PodMessage::Parse()
+bool PodMessage::Parse(const string & params_str_)
 {
     if (!HasPodMessage())
         return true;
+
+    m_standard = CPP_STANDARD::CPP_11;
+    if (params_str_ == "c++98")
+        m_standard = CPP_STANDARD::CPP_98;
+    else if (params_str_ == "c++14")
+        m_standard = CPP_STANDARD::CPP_14;
 
     InitBaseMessage();
 
@@ -432,7 +437,7 @@ string PodMessage::GetHeaderDecl() const
     stringstream ss;
     ss << "namespace " << m_tree.space << "\n{\n";
     for (auto message : m_tree.root)
-        message->DeclareStr(ss, "");
+        message->DeclareStr(ss, "", m_standard);
     ss << "\n} // namespace " << m_tree.space << "\n";
     return ss.str();
 }
@@ -458,7 +463,7 @@ string PodMessage::GetSourceImpl() const
     stringstream ss;
     ss << "namespace " << m_tree.space << "\n{\n";
     for (auto message : m_tree.root)
-        message->ImplStr(ss, "");
+        message->ImplStr(ss, "", m_standard);
     ss << "\n} // namespace " << m_tree.space << "\n";
     return ss.str();
 }

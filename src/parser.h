@@ -31,7 +31,7 @@ public:
     PodMessage(const ::google::protobuf::FileDescriptor* file_) : m_file(file_) { Prepare(); }
     ~PodMessage();
 
-    bool Parse();
+    bool Parse(const string & params_str_);
 
     string GetHeaderPrologue() const;
     string GetHeaderIncludeFile() const;
@@ -55,6 +55,7 @@ private:
     EnumStruct* ParseEnum(const ::google::protobuf::EnumDescriptor* desc_, const MessageStruct* parent_ = nullptr);
 
 private:
+    CPP_STANDARD m_standard;
     const ::google::protobuf::FileDescriptor* m_file;
     string m_base_file_name;
     vector<const ::google::protobuf::Descriptor*> m_message_vec;

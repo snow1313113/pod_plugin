@@ -10,26 +10,34 @@
 
 namespace Pepper
 {
-bool MessageStruct::DeclareStr(stringstream& ss_, const string& prefix_) const
+bool MessageStruct::DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const
 {
     ss_ << prefix_ << "struct " << name << "\n" << prefix_ << "{\n";
 
     for (auto child : nest_message)
     {
-        if (child->DeclareStr(ss_, prefix_ + g_indent))
+        if (child->DeclareStr(ss_, prefix_ + g_indent, standard_))
             ss_ << "\n";
     }
 
     for (auto field : fields)
-        field->DeclareStr(ss_, prefix_ + g_indent);
+        field->DeclareStr(ss_, prefix_ + g_indent, standard_);
 
     ss_ << "\n";
+    if (standard_ == CPP_STANDARD::CPP_98)
+        ConstructorDeclareStr(ss_, prefix_ + g_indent);
+
     ClearDeclareStr(ss_, prefix_ + g_indent);
     FromPbDeclareStr(ss_, prefix_ + g_indent);
     ToPbDeclareStr(ss_, prefix_ + g_indent);
 
     ss_ << prefix_ << "};\n";
     return true;
+}
+
+void MessageStruct::ConstructorDeclareStr(stringstream& ss_, const string& prefix_) const
+{
+    ss_ << prefix_ << name << "();\n";
 }
 
 void MessageStruct::ClearDeclareStr(stringstream& ss_, const string& prefix_) const
@@ -47,13 +55,16 @@ void MessageStruct::ToPbDeclareStr(stringstream& ss_, const string& prefix_) con
     ss_ << prefix_ << "bool ToPb(" << pb_full_name << "* msg_) const;\n";
 }
 
-bool MessageStruct::ImplStr(stringstream& ss_, const string& prefix_) const
+bool MessageStruct::ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const
 {
     for (auto child : nest_message)
     {
-        if (child->ImplStr(ss_, prefix_))
+        if (child->ImplStr(ss_, prefix_, standard_))
             ss_ << "\n";
     }
+
+    if (standard_ == CPP_STANDARD::CPP_98)
+        ConstructorImplStr(ss_, prefix_);
 
     ClearImplStr(ss_, prefix_);
     ss_ << "\n";
@@ -61,6 +72,15 @@ bool MessageStruct::ImplStr(stringstream& ss_, const string& prefix_) const
     ss_ << "\n";
     ToPbImplStr(ss_, prefix_);
     return true;
+}
+
+void MessageStruct::ConstructorImplStr(stringstream& ss_, const string& prefix_) const
+{
+    ss_ << prefix_ << full_name << "::" << name << "()\n";
+    ss_ << prefix_ << "{\n";
+    for (auto field : fields)
+        field->InitStr(ss_, prefix_ + g_indent);
+    ss_ << prefix_ << "}\n";
 }
 
 void MessageStruct::ClearImplStr(stringstream& ss_, const string& prefix_) const
@@ -92,12 +112,12 @@ void MessageStruct::ToPbImplStr(stringstream& ss_, const string& prefix_) const
     ss_ << prefix_ << "}\n";
 }
 
-void Field::DeclareStr(stringstream& ss_, const string& prefix_) const
+void Field::DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const
 {
     assert(type_message);
     if (len == 0)
     {
-        if (default_value.empty())
+        if (default_value.empty() || standard_ == CPP_STANDARD::CPP_98)
             ss_ << prefix_ << type_message->name << " " << name << ";\n";
         else
             ss_ << prefix_ << type_message->name << " " << name << " = " << default_value << ";\n";
@@ -130,7 +150,7 @@ void Field::DeclareStr(stringstream& ss_, const string& prefix_) const
                 ss_ << prefix_ << "uint64_t " << name << "_count;\n";
         }
 
-        if (default_value.empty())
+        if (default_value.empty() || standard_ == CPP_STANDARD::CPP_98)
             ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
         else
             ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = " << default_value << ";\n";
