@@ -47,4 +47,5 @@ message BaseMsg
     optional RootEnum root_enum = 12 [default = ROOT_TWO];
     optional NestedMsg.NestedEnum nested_enum = 13 [default = NESTED_TWO];
     optional NestedMsg.NestedEnum nested_enum_without_defalut = 14;
+    optional uint32 ignore_test = 15 [(ignore) = true];
 }

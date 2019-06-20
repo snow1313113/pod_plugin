@@ -20,6 +20,8 @@ extend google.protobuf.FieldOptions
     optional INT_TYPE int_type = 30002;
     // max len of string
     optional uint32 str_len = 30003;
+    // gen pod ignore this field
+    optional bool ignore = 30004 [default = false];
 }
 
 extend google.protobuf.MessageOptions

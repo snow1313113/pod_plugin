@@ -152,7 +152,7 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
 {
     if (m_message_mgr.find(desc_->full_name()) != m_message_mgr.end())
     {
-        m_err_msg = desc_->full_name() + " is not uniq";
+        m_err_msg += ((desc_->full_name() + " is not uniq\n"));
         return nullptr;
     }
 
@@ -162,7 +162,7 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
     auto parent_desc = desc_->containing_type();
     if ((parent_desc && !parent_) || (!parent_desc && parent_))
     {
-        m_err_msg = "containing_type not accordance parent";
+        m_err_msg += "containing_type not accordance parent\n";
         return nullptr;
     }
 
@@ -192,22 +192,20 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
             continue;
 
         auto child = ParseMessage(child_desc, m.get());
-        if (!child)
-            return nullptr;
-        m->nest_message.push_back(child);
+        if (child)
+            m->nest_message.push_back(child);
     }
 
     for (int i = 0; i < desc_->field_count(); ++i)
     {
         auto field = ParseField(desc_->field(i));
-        if (!field)
-            return nullptr;
-        m->fields.push_back(field);
+        if (field)
+            m->fields.push_back(field);
     }
 
     if (!(m_message_mgr.insert(std::make_pair(desc_->full_name(), m.get())).second))
     {
-        m_err_msg = desc_->full_name() + " is not uniq, ERROR";
+        m_err_msg += (desc_->full_name() + " is not uniq, ERROR");
         return nullptr;
     }
 
@@ -218,6 +216,10 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
 {
     // ignore extension field
     if (desc_->is_extension())
+        return nullptr;
+
+    // this field is ignore
+    if (desc_->options().GetExtension(ignore))
         return nullptr;
 
     std::unique_ptr<Field> f(new Field);
@@ -285,7 +287,7 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             // string cannot repeated
             if (desc_->is_repeated())
             {
-                m_err_msg = "string can not be repeated";
+                m_err_msg += ("string can not be repeated\n");
                 return nullptr;
             }
 
@@ -309,7 +311,7 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             auto it = m_message_mgr.find(desc_->enum_type()->full_name());
             if (it == m_message_mgr.end())
             {
-                m_err_msg = string(desc_->enum_type()->full_name()) + " is not found";
+                m_err_msg += (string{desc_->enum_type()->full_name()} + " is not found\n");
                 return nullptr;
             }
 
@@ -328,7 +330,7 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             auto it = m_message_mgr.find(desc_->message_type()->full_name());
             if (it == m_message_mgr.end())
             {
-                m_err_msg = string(desc_->message_type()->full_name()) + " is not found";
+                m_err_msg += (string{desc_->message_type()->full_name()} + " is not found\n");
                 return nullptr;
             }
 
@@ -338,14 +340,14 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
         }
         default:
         {
-            m_err_msg = "unknow cpp_type, ERROR";
+            m_err_msg += ("unknow cpp_type, ERROR\n");
             return nullptr;
         }
     }
 
     if (!(f->type_message))
     {
-        m_err_msg = desc_->full_name() + " is unknow";
+        m_err_msg += (desc_->full_name() + " is unknow\n");
         return nullptr;
     }
 
@@ -379,7 +381,7 @@ EnumStruct *PodMessage::ParseEnum(const ::google::protobuf::EnumDescriptor *desc
     auto parent_desc = desc_->containing_type();
     if ((parent_desc && !parent_) || (!parent_desc && parent_))
     {
-        m_err_msg = "containing_type not accordance parent";
+        m_err_msg += ("containing_type not accordance parent\n");
         return nullptr;
     }
 
@@ -394,7 +396,7 @@ EnumStruct *PodMessage::ParseEnum(const ::google::protobuf::EnumDescriptor *desc
 
     if (!(m_message_mgr.insert(std::make_pair(desc_->full_name(), e.get())).second))
     {
-        m_err_msg = desc_->full_name() + " is not uniq, ERROR";
+        m_err_msg += (desc_->full_name() + " is not uniq, ERROR\n");
         return nullptr;
     }
 
