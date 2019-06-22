@@ -57,8 +57,14 @@ struct BuiltInStruct : public BaseStruct
     {
     }
     virtual ~BuiltInStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final{return false;};
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final{return false;};
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
+    {
+        return false;
+    };
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
+    {
+        return false;
+    };
 };
 
 struct MessageStruct;
@@ -68,8 +74,14 @@ struct EnumStruct : public BaseStruct
 
     EnumStruct() : BaseStruct{"", "", MSG_TYPE::ENUM} {}
     virtual ~EnumStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final{return false;};
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final{return false;};
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
+    {
+        return false;
+    };
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
+    {
+        return false;
+    };
 };
 
 struct Field;
@@ -105,8 +117,14 @@ struct UnknowStruct : public BaseStruct
     UnknowStruct() : UnknowStruct("", "") {}
     UnknowStruct(const string& name_, const string& full_name_) : BaseStruct{name_, full_name_, MSG_TYPE::STRUCT} {}
     virtual ~UnknowStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final{return false;};
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final{return false;};
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
+    {
+        return false;
+    };
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
+    {
+        return false;
+    };
 };
 
 struct Field

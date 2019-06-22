@@ -31,7 +31,7 @@ public:
     PodMessage(const ::google::protobuf::FileDescriptor* file_) : m_file(file_) { Prepare(); }
     ~PodMessage();
 
-    bool Parse(const string & params_str_);
+    bool Parse(const string& params_str_);
 
     string GetHeaderPrologue() const;
     string GetHeaderIncludeFile() const;

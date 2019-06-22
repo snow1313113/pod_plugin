@@ -1,0 +1,24 @@
+---
+Language:        Cpp
+BasedOnStyle:  Google
+PointerAlignment: Right
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+BraceWrapping:   
+  AfterClass:      true
+  AfterControlStatement: true
+  AfterEnum:       true
+  AfterFunction:   true
+  AfterNamespace:  true
+  AfterObjCDeclaration: true
+  AfterStruct:     true
+  AfterUnion:      true
+  AfterExternBlock: true
+  BeforeCatch:     true
+  BeforeElse:      true
+BreakBeforeBraces: Custom
+ColumnLimit:     120
+IndentWidth:     4
+TabWidth:        4

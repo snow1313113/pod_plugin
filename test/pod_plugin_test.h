@@ -8,11 +8,11 @@
 #ifndef _POD_PLUGIN_TEST_H_
 #define _POD_PLUGIN_TEST_H_
 
+#include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <map>
 #include <set>
-#include <cstdlib>
-#include <algorithm>
-#include <iostream>
 #include "gtest/gtest.h"
 #include "test.pod.h"
 

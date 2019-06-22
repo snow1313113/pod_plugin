@@ -18,7 +18,6 @@ using std::stringstream;
 
 namespace Pepper
 {
-
 string base_name(const string &str_)
 {
     stringstream input(str_);
@@ -109,7 +108,7 @@ void PodMessage::InitBaseMessage()
     g_builtin[static_cast<size_t>(FIELD_TYPE::STRUCT)] = nullptr;
 }
 
-bool PodMessage::Parse(const string & params_str_)
+bool PodMessage::Parse(const string &params_str_)
 {
     if (!HasPodMessage())
         return true;
@@ -329,7 +328,8 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             auto enum_struct = static_cast<const EnumStruct *>(f->type_message);
             assert(enum_struct);
             if (enum_struct->parent_message)
-                f->default_value = enum_struct->parent_message->pb_full_name + "::" + desc_->default_value_enum()->name();
+                f->default_value =
+                    enum_struct->parent_message->pb_full_name + "::" + desc_->default_value_enum()->name();
             else
                 f->default_value = f->type_message->name + "::" + desc_->default_value_enum()->name();
             break;

@@ -175,14 +175,16 @@ void Field::DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD st
                 if (default_value.empty())
                     ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = {0};\n";
                 else
-                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = \"" << default_value << "\";\n";
+                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = \""
+                        << default_value << "\";\n";
             }
             else
             {
                 if (default_value.empty())
                     ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
                 else
-                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = {" << default_value << "};\n";
+                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = {"
+                        << default_value << "};\n";
             }
         }
     }
