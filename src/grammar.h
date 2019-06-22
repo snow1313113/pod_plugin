@@ -86,11 +86,13 @@ struct MessageStruct : public BaseStruct
 
 private:
     void ConstructorDeclareStr(stringstream& ss_, const string& prefix_) const;
+    void ResetDeclareStr(stringstream& ss_, const string& prefix_) const;
     void ClearDeclareStr(stringstream& ss_, const string& prefix_) const;
     void FromPbDeclareStr(stringstream& ss_, const string& prefix_) const;
     void ToPbDeclareStr(stringstream& ss_, const string& prefix_) const;
 
     void ConstructorImplStr(stringstream& ss_, const string& prefix_) const;
+    void ResetImplStr(stringstream& ss_, const string& prefix_) const;
     void ClearImplStr(stringstream& ss_, const string& prefix_) const;
     void FromPbImplStr(stringstream& ss_, const string& prefix_) const;
     void ToPbImplStr(stringstream& ss_, const string& prefix_) const;

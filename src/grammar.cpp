@@ -27,6 +27,7 @@ bool MessageStruct::DeclareStr(stringstream& ss_, const string& prefix_, CPP_STA
     if (standard_ == CPP_STANDARD::CPP_98)
         ConstructorDeclareStr(ss_, prefix_ + g_indent);
 
+    ResetDeclareStr(ss_, prefix_ + g_indent);
     ClearDeclareStr(ss_, prefix_ + g_indent);
     FromPbDeclareStr(ss_, prefix_ + g_indent);
     ToPbDeclareStr(ss_, prefix_ + g_indent);
@@ -38,6 +39,11 @@ bool MessageStruct::DeclareStr(stringstream& ss_, const string& prefix_, CPP_STA
 void MessageStruct::ConstructorDeclareStr(stringstream& ss_, const string& prefix_) const
 {
     ss_ << prefix_ << name << "();\n";
+}
+
+void MessageStruct::ResetDeclareStr(stringstream& ss_, const string& prefix_) const
+{
+    ss_ << prefix_ << "void Reset();\n";
 }
 
 void MessageStruct::ClearDeclareStr(stringstream& ss_, const string& prefix_) const
@@ -66,6 +72,8 @@ bool MessageStruct::ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDA
     if (standard_ == CPP_STANDARD::CPP_98)
         ConstructorImplStr(ss_, prefix_);
 
+    ResetImplStr(ss_, prefix_);
+    ss_ << "\n";
     ClearImplStr(ss_, prefix_);
     ss_ << "\n";
     FromPbImplStr(ss_, prefix_);
@@ -78,6 +86,15 @@ void MessageStruct::ConstructorImplStr(stringstream& ss_, const string& prefix_)
 {
     ss_ << prefix_ << full_name << "::" << name << "()\n";
     ss_ << prefix_ << "{\n";
+    // todo
+    ss_ << prefix_ << g_indent << "Reset();\n";
+    ss_ << prefix_ << "}\n";
+}
+
+void MessageStruct::ResetImplStr(stringstream& ss_, const string& prefix_) const
+{
+    ss_ << prefix_ << "void " << full_name << "::Reset()\n";
+    ss_ << prefix_ << "{\n";
     for (auto field : fields)
         field->InitStr(ss_, prefix_ + g_indent);
     ss_ << prefix_ << "}\n";
@@ -87,8 +104,7 @@ void MessageStruct::ClearImplStr(stringstream& ss_, const string& prefix_) const
 {
     ss_ << prefix_ << "void " << full_name << "::Clear()\n";
     ss_ << prefix_ << "{\n";
-    for (auto field : fields)
-        field->InitStr(ss_, prefix_ + g_indent);
+    ss_ << prefix_ << g_indent << "std::memset(this, 0, sizeof(" << full_name << "));\n";
     ss_ << prefix_ << "}\n";
 }
 
@@ -150,10 +166,25 @@ void Field::DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD st
                 ss_ << prefix_ << "uint64_t " << name << "_count;\n";
         }
 
-        if (default_value.empty() || standard_ == CPP_STANDARD::CPP_98)
+        if (standard_ == CPP_STANDARD::CPP_98)
             ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
         else
-            ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = " << default_value << ";\n";
+        {
+            if (type_message->msg_type == MSG_TYPE::STRING)
+            {
+                if (default_value.empty())
+                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = {0};\n";
+                else
+                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = \"" << default_value << "\";\n";
+            }
+            else
+            {
+                if (default_value.empty())
+                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "];\n";
+                else
+                    ss_ << prefix_ << type_message->name << " " << name << "[" << max_len_name << "] = {" << default_value << "};\n";
+            }
+        }
     }
 }
 
@@ -232,7 +263,7 @@ void Field::SetFixedArrayMessageStr(stringstream& ss_, const string& prefix_) co
 
 void Field::SetStringStr(stringstream& ss_, const string& prefix_) const
 {
-    ss_ << prefix_ << "msg_->set_" << name << "(" << name << ", strlen(" << name << "));\n";
+    ss_ << prefix_ << "msg_->set_" << name << "(" << name << ", std::strlen(" << name << "));\n";
 }
 
 void Field::GetPbStr(stringstream& ss_, const string& prefix_) const
@@ -368,22 +399,36 @@ void Field::InitSingleMessageStr(stringstream& ss_, const string& prefix_) const
 
 void Field::InitArrayVarStr(stringstream& ss_, const string& prefix_) const
 {
+    // todo
 }
 
 void Field::InitFixedArrayVarStr(stringstream& ss_, const string& prefix_) const
 {
+    // todo
 }
 
 void Field::InitArrayMessageStr(stringstream& ss_, const string& prefix_) const
 {
+    // todo
 }
 
 void Field::InitFixedArrayMessageStr(stringstream& ss_, const string& prefix_) const
 {
+    // todo
 }
 
 void Field::InitStringStr(stringstream& ss_, const string& prefix_) const
 {
+    if (default_value.empty())
+    {
+        ss_ << prefix_ << name << "[0] = '\\0';\n";
+    }
+    else
+    {
+        ss_ << prefix_ << "std::string __tmp_" << name << "__{\"" << default_value << "\"};\n";
+        ss_ << prefix_ << "__tmp_" << name << "__.copy(" << name << ", __tmp_" << name << "__.size());\n";
+        ss_ << prefix_ << name << "[__tmp_" << name << "__.size()] = '\\0';\n";
+    }
 }
 
 }  // namespace Pepper

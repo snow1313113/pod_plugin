@@ -188,19 +188,34 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
     for (int i = 0; i < desc_->nested_type_count(); ++i)
     {
         auto child_desc = desc_->nested_type(i);
+        assert(child_desc);
+
+        // this message is ignore
         if (child_desc->options().GetExtension(gen_pod) != 1)
             continue;
 
         auto child = ParseMessage(child_desc, m.get());
-        if (child)
-            m->nest_message.push_back(child);
+        if (!child)
+            return nullptr;
+        m->nest_message.push_back(child);
     }
 
     for (int i = 0; i < desc_->field_count(); ++i)
     {
-        auto field = ParseField(desc_->field(i));
-        if (field)
-            m->fields.push_back(field);
+        auto field_desc = desc_->field(i);
+        assert(field_desc);
+
+        // ignore extension field
+        if (field_desc->is_extension())
+            continue;
+        // this field is ignore
+        if (field_desc->options().GetExtension(ignore))
+            continue;
+
+        auto field = ParseField(field_desc);
+        if (!field)
+            return nullptr;
+        m->fields.push_back(field);
     }
 
     if (!(m_message_mgr.insert(std::make_pair(desc_->full_name(), m.get())).second))
@@ -214,14 +229,6 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
 
 Field *PodMessage::ParseField(const FieldDescriptor *desc_)
 {
-    // ignore extension field
-    if (desc_->is_extension())
-        return nullptr;
-
-    // this field is ignore
-    if (desc_->options().GetExtension(ignore))
-        return nullptr;
-
     std::unique_ptr<Field> f(new Field);
     f->name = desc_->name();
     f->type_message = nullptr;
@@ -296,13 +303,16 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
             else
                 f->len = 1;
 
+            if (desc_->default_value_string().size() + 1 > f->len)
+            {
+                m_err_msg += ("len of string default value longer than str_len\n");
+                return nullptr;
+            }
+
             f->fixed_len = true;
             f->type_message = g_builtin[static_cast<size_t>(FIELD_TYPE::CHAR)];
             f->default_value = desc_->default_value_string();
-            if (f->default_value.empty())
-                f->default_value = "{0}";
-            else
-                f->default_value = string("\"") + f->default_value + "\"";
+
             break;
         }
         case FieldDescriptor::CPPTYPE_ENUM:
@@ -353,9 +363,6 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
 
     if (desc_->is_repeated())
     {
-        if (!(f->default_value.empty()))
-            f->default_value = string("{") + f->default_value + "}";
-
         if (desc_->options().HasExtension(max_count))
         {
             f->len = desc_->options().GetExtension(max_count);
@@ -457,7 +464,7 @@ string PodMessage::GetSourcePrologue() const
 
 string PodMessage::GetSourceIncludeFile() const
 {
-    return string("\n#include \"") + m_base_file_name + ".pod.h\"\n\n";
+    return string("\n#include <cstring>\n#include <string>\n#include \"") + m_base_file_name + ".pod.h\"\n\n";
 }
 
 string PodMessage::GetSourceImpl() const
