@@ -84,7 +84,7 @@ void PodMessage::Prepare()
         auto &options = message->options();
         auto value = options.GetExtension(gen_pod);
         // todo 这里非pod的message内嵌pod的message并不会有效，是否要生效？
-        if (value == 1)
+        if (value)
             m_message_vec.push_back(message);
     }
 }
@@ -190,7 +190,7 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
         assert(child_desc);
 
         // this message is ignore
-        if (child_desc->options().GetExtension(gen_pod) != 1)
+        if (!child_desc->options().GetExtension(gen_pod))
             continue;
 
         auto child = ParseMessage(child_desc, m.get());

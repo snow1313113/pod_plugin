@@ -21,12 +21,12 @@ message BaseMsg
             NESTED_THREE = 3;
         }
 
-        option (gen_pod) = 1;
+        option (gen_pod) = true;
         optional uint32 id = 1;
         optional uint32 sex = 2;
     }
 
-    option (gen_pod) = 1;
+    option (gen_pod) = true;
     required uint64 id = 1 [(int_type) = UINT16, default = 100];
     optional int64 id_without_default = 2;
 

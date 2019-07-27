@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 
+project(pod_plugin_root)
+
 include(common.cmake)
 
 # can use your own protobuf directory here

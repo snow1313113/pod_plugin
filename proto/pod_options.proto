@@ -28,6 +28,6 @@ extend google.protobuf.MessageOptions
 {
     // 1: need to generate pod data code
     // 2: need to generate pod data code without constructor
-    optional int32 gen_pod = 30000;
+    optional bool gen_pod = 30000;
 }
 
