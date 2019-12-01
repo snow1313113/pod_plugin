@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+import "pod_options.proto";
+
+package Test;
+
+message ParentMsg
+{
+    option (gen_pod) = true;
+    optional uint32 parent_id = 1;
+    optional uint32 parent_sex = 2;
+}
+
+message Parent2Msg
+{
+    option (gen_pod) = true;
+    optional uint32 parent_id = 1;
+    optional uint32 parent_sex = 2;
+}

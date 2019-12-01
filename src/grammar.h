@@ -127,6 +127,9 @@ struct UnknowStruct : public BaseStruct
     };
 };
 
+using ImportMessageStruct = UnknowStruct;
+using ImportEnumStruct = UnknowStruct;
+
 struct Field
 {
     string name;

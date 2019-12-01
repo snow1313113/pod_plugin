@@ -1,6 +1,7 @@
 syntax = "proto2";
 
 import "pod_options.proto";
+import "parent.proto";
 
 package Test;
 
@@ -48,4 +49,5 @@ message BaseMsg
     optional NestedMsg.NestedEnum nested_enum = 13 [default = NESTED_TWO];
     optional NestedMsg.NestedEnum nested_enum_without_defalut = 14;
     optional uint32 ignore_test = 15 [(ignore) = true];
+    optional ParentMsg parent_test = 16;
 }

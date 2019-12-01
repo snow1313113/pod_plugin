@@ -83,10 +83,46 @@ void PodMessage::Prepare()
         auto message = m_file->message_type(i);
         auto &options = message->options();
         auto value = options.GetExtension(gen_pod);
-        // todo 这里非pod的message内嵌pod的message并不会有效，是否要生效？
         if (value)
             m_message_vec.push_back(message);
     }
+}
+
+void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor* desc_, const BaseStruct* parent_)
+{
+    if (m_message_mgr.find(desc_->full_name()) != m_message_mgr.end())
+    {
+        m_err_msg += ((desc_->full_name() + " is not uniq(collect)\n"));
+        return;
+    }
+
+    std::unique_ptr<ImportMessageStruct> m(new ImportMessageStruct);
+    m->name = g_message_prefix + desc_->name();
+    m->msg_type = MSG_TYPE::STRUCT;
+
+    if (parent_)
+        m->full_name = parent_->full_name + "::" + m->name;
+    else
+        m->full_name = m->name;
+
+    for (int i = 0; i < desc_->nested_type_count(); ++i)
+    {
+        auto child_desc = desc_->nested_type(i);
+        assert(child_desc);
+
+        // this message is ignore
+        if (!child_desc->options().GetExtension(gen_pod))
+            continue;
+
+        CollectImportMsg(child_desc, m.get());
+    }
+
+    if (!(m_message_mgr.insert(std::make_pair(desc_->full_name(), m.get())).second))
+    {
+        m_err_msg += (desc_->full_name() + " is not uniq, ERROR");
+        return;
+    }
+    m.release();
 }
 
 void PodMessage::InitBaseMessage()
@@ -121,6 +157,14 @@ bool PodMessage::Parse(const string &params_str_)
 
     InitBaseMessage();
 
+    for (int i = 0; i < m_file->dependency_count(); ++i)
+    {
+        for (int j = 0; j < m_file->dependency(i)->message_type_count(); ++j)
+        {
+            CollectImportMsg(m_file->dependency(i)->message_type(j));
+        }
+    }
+
     m_tree.space = m_file->package();
     for (int i = 0; i < m_file->dependency_count(); ++i)
         m_tree.includes.emplace_back(base_name(m_file->dependency(i)->name()));
@@ -151,7 +195,11 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
 {
     if (m_message_mgr.find(desc_->full_name()) != m_message_mgr.end())
     {
-        m_err_msg += ((desc_->full_name() + " is not uniq\n"));
+        m_err_msg += ((desc_->full_name() + " is not uniq(parse)\n"));
+        for (auto temp : m_message_mgr)
+        {
+            m_err_msg += ((temp.first + "\n"));
+        }
         return nullptr;
     }
 
@@ -427,14 +475,14 @@ string PodMessage::GetHeaderIncludeFile() const
     {
         if (it == "pod_options")
             continue;
-        ss << "#include \"" << it << ".pb.h\"\n";
+        ss << "#include \"" << it << ".pod.h\"\n";
     }
 
     if (!m_tree.public_includes.empty())
     {
         ss << "// public include\n";
         for (auto it : m_tree.public_includes)
-            ss << "#include \"" << it << ".pb.h\"\n";
+            ss << "#include \"" << it << ".pod.h\"\n";
     }
     ss << "#include \"" << m_base_file_name << ".pb.h\"\n";
     ss << "\n";
