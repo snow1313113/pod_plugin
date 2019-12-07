@@ -14,10 +14,10 @@ link_directories(${PROTOBUF_LIB})
 add_executable(${PROJECT_NAME} ${SOURCE})
 
 target_link_libraries(${PROJECT_NAME} 
-    protoc
-    protobuf
-    pthread
     ${POD_LIB}/libpod_pb.a
+    libprotobuf.a
+    libprotoc.a
+    pthread
     )
 
 set(EXECUTABLE_OUTPUT_PATH ${POD_LIB})
