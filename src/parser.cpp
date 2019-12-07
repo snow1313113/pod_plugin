@@ -88,7 +88,7 @@ void PodMessage::Prepare()
     }
 }
 
-void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor* desc_, const BaseStruct* parent_)
+void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor *desc_, const BaseMessageStruct *parent_)
 {
     if (m_message_mgr.find(desc_->full_name()) != m_message_mgr.end())
     {
@@ -96,14 +96,25 @@ void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor* desc_, c
         return;
     }
 
-    std::unique_ptr<ImportMessageStruct> m(new ImportMessageStruct);
+    std::unique_ptr<BaseMessageStruct> m(new BaseMessageStruct);
     m->name = g_message_prefix + desc_->name();
     m->msg_type = MSG_TYPE::STRUCT;
 
     if (parent_)
+    {
         m->full_name = parent_->full_name + "::" + m->name;
+        m->pb_full_name = parent_->pb_full_name + "::" + desc_->name();
+    }
     else
+    {
         m->full_name = m->name;
+        m->pb_full_name = desc_->name();
+    }
+
+    for (int i = 0; i < desc_->enum_type_count(); ++i)
+    {
+        CollectImportEnum(desc_->enum_type(i), m.get());
+    }
 
     for (int i = 0; i < desc_->nested_type_count(); ++i)
     {
@@ -123,6 +134,11 @@ void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor* desc_, c
         return;
     }
     m.release();
+}
+
+void PodMessage::CollectImportEnum(const ::google::protobuf::EnumDescriptor *desc_, const BaseMessageStruct *parent_)
+{
+    // todo
 }
 
 void PodMessage::InitBaseMessage()
@@ -161,7 +177,17 @@ bool PodMessage::Parse(const string &params_str_)
     {
         for (int j = 0; j < m_file->dependency(i)->message_type_count(); ++j)
         {
-            CollectImportMsg(m_file->dependency(i)->message_type(j));
+            auto msg_desc = m_file->dependency(i)->message_type(j);
+            // this message is ignore
+            if (!msg_desc->options().GetExtension(gen_pod))
+                continue;
+            CollectImportMsg(msg_desc);
+        }
+
+        for (int j = 0; j < m_file->dependency(i)->enum_type_count(); ++j)
+        {
+            auto enum_desc = m_file->dependency(i)->enum_type(j);
+            CollectImportEnum(enum_desc);
         }
     }
 
@@ -384,7 +410,6 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
         }
         case FieldDescriptor::CPPTYPE_MESSAGE:
         {
-            // todo maybe declare in other file
             auto it = m_message_mgr.find(desc_->message_type()->full_name());
             if (it == m_message_mgr.end())
             {

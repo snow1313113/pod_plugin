@@ -50,7 +50,8 @@ public:
 private:
     void Prepare();
     void InitBaseMessage();
-    void CollectImportMsg(const ::google::protobuf::Descriptor* desc_, const BaseStruct* parent_ = nullptr);
+    void CollectImportMsg(const ::google::protobuf::Descriptor* desc_, const BaseMessageStruct* parent_ = nullptr);
+    void CollectImportEnum(const ::google::protobuf::EnumDescriptor* desc_, const BaseMessageStruct* parent_ = nullptr);
     MessageStruct* ParseMessage(const ::google::protobuf::Descriptor* desc_, const MessageStruct* parent_ = nullptr);
     Field* ParseField(const ::google::protobuf::FieldDescriptor* desc_);
     EnumStruct* ParseEnum(const ::google::protobuf::EnumDescriptor* desc_, const MessageStruct* parent_ = nullptr);

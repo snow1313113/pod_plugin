@@ -84,14 +84,29 @@ struct EnumStruct : public BaseStruct
     };
 };
 
-struct Field;
-struct MessageStruct : public BaseStruct
+struct BaseMessageStruct : public BaseStruct
 {
     string pb_full_name;
+
+    BaseMessageStruct() : BaseStruct{"", "", MSG_TYPE::STRUCT}, pb_full_name("") {}
+    virtual ~BaseMessageStruct() = default;
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const override
+    {
+        return false;
+    }
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const override
+    {
+        return false;
+    }
+};
+
+struct Field;
+struct MessageStruct : public BaseMessageStruct
+{
     vector<BaseStruct*> nest_message;
     vector<Field*> fields;
 
-    MessageStruct() : BaseStruct{"", "", MSG_TYPE::STRUCT}, pb_full_name("") {}
+    MessageStruct() = default;
     virtual ~MessageStruct() = default;
     virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final;
     virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final;

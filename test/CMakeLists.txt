@@ -9,7 +9,7 @@ SET(PROTOC_TOOL ${PROTOBUF_DIR}/protoc)
 SET(PROTOBUF_LIB ${PROTOBUF_DIR}/.libs)
 
 # can use your own googletest directory here
-SET(GTEST_ROOT ${ROOT_DIR}/../../../open_source/googletest)
+SET(GTEST_ROOT ${ROOT_DIR}/../third_party/googletest)
 SET(GTEST_INCLUDE ${GTEST_ROOT}/googletest/include)
 SET(GTEST_LIB ${GTEST_ROOT}/build/lib)
 
@@ -46,8 +46,8 @@ aux_source_directory(. SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 target_link_libraries(${PROJECT_NAME}
-    gtest
-    pod_pb
-    protobuf
+    libgtest.a
+    libpod_pb.a
+    libprotobuf.a
     pthread
     )
