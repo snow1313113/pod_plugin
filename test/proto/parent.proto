@@ -7,8 +7,16 @@ package Test;
 message ParentMsg
 {
     option (gen_pod) = true;
+    enum ParentNestedEnum
+    {
+        P_NESTED_ONE = 1;
+        P_NESTED_TWO = 2;
+        P_NESTED_THREE = 3;
+    }
+
     optional uint32 parent_id = 1;
     optional uint32 parent_sex = 2;
+    optional ParentNestedEnum parent_enum = 3;
 }
 
 message Parent2Msg

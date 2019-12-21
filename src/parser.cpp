@@ -113,7 +113,7 @@ void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor *desc_, c
 
     for (int i = 0; i < desc_->enum_type_count(); ++i)
     {
-        CollectImportEnum(desc_->enum_type(i), m.get());
+        ParseEnum(desc_->enum_type(i), m.get());
     }
 
     for (int i = 0; i < desc_->nested_type_count(); ++i)
@@ -134,11 +134,6 @@ void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor *desc_, c
         return;
     }
     m.release();
-}
-
-void PodMessage::CollectImportEnum(const ::google::protobuf::EnumDescriptor *desc_, const BaseMessageStruct *parent_)
-{
-    // todo
 }
 
 void PodMessage::InitBaseMessage()
@@ -185,10 +180,7 @@ bool PodMessage::Parse(const string &params_str_)
         }
 
         for (int j = 0; j < m_file->dependency(i)->enum_type_count(); ++j)
-        {
-            auto enum_desc = m_file->dependency(i)->enum_type(j);
-            CollectImportEnum(enum_desc);
-        }
+            ParseEnum(m_file->dependency(i)->enum_type(j));
     }
 
     m_tree.space = m_file->package();
@@ -452,7 +444,7 @@ Field *PodMessage::ParseField(const FieldDescriptor *desc_)
     return f.release();
 }
 
-EnumStruct *PodMessage::ParseEnum(const ::google::protobuf::EnumDescriptor *desc_, const MessageStruct *parent_)
+EnumStruct *PodMessage::ParseEnum(const ::google::protobuf::EnumDescriptor *desc_, const BaseMessageStruct *parent_)
 {
     std::unique_ptr<EnumStruct> e(new EnumStruct);
     e->name = desc_->name();

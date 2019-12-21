@@ -67,10 +67,10 @@ struct BuiltInStruct : public BaseStruct
     };
 };
 
-struct MessageStruct;
+struct BaseMessageStruct;
 struct EnumStruct : public BaseStruct
 {
-    const MessageStruct* parent_message = nullptr;
+    const BaseMessageStruct* parent_message = nullptr;
 
     EnumStruct() : BaseStruct{"", "", MSG_TYPE::ENUM} {}
     virtual ~EnumStruct() = default;
@@ -141,9 +141,6 @@ struct UnknowStruct : public BaseStruct
         return false;
     };
 };
-
-using ImportMessageStruct = UnknowStruct;
-using ImportEnumStruct = UnknowStruct;
 
 struct Field
 {

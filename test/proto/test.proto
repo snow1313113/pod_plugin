@@ -50,4 +50,5 @@ message BaseMsg
     optional NestedMsg.NestedEnum nested_enum_without_defalut = 14;
     optional uint32 ignore_test = 15 [(ignore) = true];
     optional ParentMsg parent_test = 16;
+    optional ParentMsg.ParentNestedEnum parent_enum_test = 17;
 }
