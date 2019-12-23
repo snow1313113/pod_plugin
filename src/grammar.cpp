@@ -232,15 +232,31 @@ void Field::SetSingleMessageStr(stringstream& ss_, const string& prefix_) const
 void Field::SetArrayVarStr(stringstream& ss_, const string& prefix_) const
 {
     ss_ << prefix_ << "msg_->mutable_" << name << "()->Clear();\n";
-    ss_ << prefix_ << "for (size_t i = 0; i < " << name << "_count && i < max_" << name << "_count; ++i)\n";
-    ss_ << prefix_ << GlobalVar::indent << "msg_->mutable_" << name << "()->Add(" << name << "[i]);\n";
+    if (GlobalVar::standard == CPP_STANDARD::CPP_98)
+    {
+        ss_ << prefix_ << "for (size_t i = 0; i < " << name << "_count && i < max_" << name << "_count; ++i)\n";
+        ss_ << prefix_ << GlobalVar::indent << "msg_->mutable_" << name << "()->Add(" << name << "[i]);\n";
+    }
+    else
+    {
+        ss_ << prefix_ << "std::for_each(" << name << ", " << name << " + " << name
+            << "_count, [&msg_](const auto& temp) { msg_->mutable_" << name << "()->Add(temp); });\n";
+    }
 }
 
 void Field::SetFixedArrayVarStr(stringstream& ss_, const string& prefix_) const
 {
     ss_ << prefix_ << "msg_->mutable_" << name << "()->Clear();\n";
-    ss_ << prefix_ << "for (size_t i = 0; i < max_" << name << "_count; ++i)\n";
-    ss_ << prefix_ << GlobalVar::indent << "msg_->mutable_" << name << "()->Add(" << name << "[i]);\n";
+    if (GlobalVar::standard == CPP_STANDARD::CPP_98)
+    {
+        ss_ << prefix_ << "for (size_t i = 0; i < max_" << name << "_count; ++i)\n";
+        ss_ << prefix_ << GlobalVar::indent << "msg_->mutable_" << name << "()->Add(" << name << "[i]);\n";
+    }
+    else
+    {
+        ss_ << prefix_ << "std::for_each(" << name << ", " << name << " + max_" << name
+            << "_count, [&msg_](const auto& temp) { msg_->mutable_" << name << "()->Add(temp); });\n";
+    }
 }
 
 void Field::SetArrayMessageStr(stringstream& ss_, const string& prefix_) const
