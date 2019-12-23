@@ -43,12 +43,13 @@ message BaseMsg
     optional string str = 9 [(str_len) = 10, default = "hello"];
     optional string str_without_default = 10;
 
-    repeated NestedMsg nested_msg = 11 [(fixed_max_count) = 5];
+    repeated NestedMsg fixed_nested_msg = 11 [(fixed_max_count) = 5];
+    repeated NestedMsg unfixed_nested_msg = 12 [(max_count) = 5];
 
-    optional RootEnum root_enum = 12 [default = ROOT_TWO];
-    optional NestedMsg.NestedEnum nested_enum = 13 [default = NESTED_TWO];
-    optional NestedMsg.NestedEnum nested_enum_without_defalut = 14;
-    optional uint32 ignore_test = 15 [(ignore) = true];
-    optional ParentMsg parent_test = 16;
-    optional ParentMsg.ParentNestedEnum parent_enum_test = 17;
+    optional RootEnum root_enum = 13 [default = ROOT_TWO];
+    optional NestedMsg.NestedEnum nested_enum = 14 [default = NESTED_TWO];
+    optional NestedMsg.NestedEnum nested_enum_without_defalut = 15;
+    optional uint32 ignore_test = 16 [(ignore) = true];
+    optional ParentMsg parent_test = 17;
+    optional ParentMsg.ParentNestedEnum parent_enum_test = 18;
 }

@@ -1,7 +1,7 @@
 /*
  * * file name: parser.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2019 5月 21
  * */
 
@@ -56,7 +56,6 @@ private:
     EnumStruct* ParseEnum(const ::google::protobuf::EnumDescriptor* desc_, const BaseMessageStruct* parent_ = nullptr);
 
 private:
-    CPP_STANDARD m_standard;
     const ::google::protobuf::FileDescriptor* m_file;
     string m_base_file_name;
     vector<const ::google::protobuf::Descriptor*> m_message_vec;

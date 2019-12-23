@@ -1,7 +1,7 @@
 /*
  * * file name: grammar.h
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2019 5月 21
  * */
 
@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "global_var.h"
 
 using std::string;
 using std::stringstream;
@@ -18,13 +19,6 @@ using std::vector;
 
 namespace Pepper
 {
-enum class CPP_STANDARD : size_t
-{
-    CPP_98 = 1,
-    CPP_11 = 2,
-    CPP_14 = 3,
-};
-
 enum class MSG_TYPE : uint8_t
 {
     SIMPLE = 0,
@@ -45,9 +39,9 @@ struct BaseStruct
     }
     virtual ~BaseStruct() = default;
     // return false if is nothing output
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const = 0;
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_) const = 0;
     // return false if is nothing output
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const = 0;
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_) const = 0;
 };
 
 struct BuiltInStruct : public BaseStruct
@@ -57,14 +51,8 @@ struct BuiltInStruct : public BaseStruct
     {
     }
     virtual ~BuiltInStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
-    {
-        return false;
-    };
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
-    {
-        return false;
-    };
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_) const final { return false; };
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_) const final { return false; };
 };
 
 struct BaseMessageStruct;
@@ -74,14 +62,8 @@ struct EnumStruct : public BaseStruct
 
     EnumStruct() : BaseStruct{"", "", MSG_TYPE::ENUM} {}
     virtual ~EnumStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
-    {
-        return false;
-    };
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
-    {
-        return false;
-    };
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_) const final { return false; };
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_) const final { return false; };
 };
 
 struct BaseMessageStruct : public BaseStruct
@@ -90,14 +72,8 @@ struct BaseMessageStruct : public BaseStruct
 
     BaseMessageStruct() : BaseStruct{"", "", MSG_TYPE::STRUCT}, pb_full_name("") {}
     virtual ~BaseMessageStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const override
-    {
-        return false;
-    }
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const override
-    {
-        return false;
-    }
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_) const override { return false; }
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_) const override { return false; }
 };
 
 struct Field;
@@ -108,8 +84,8 @@ struct MessageStruct : public BaseMessageStruct
 
     MessageStruct() = default;
     virtual ~MessageStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final;
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final;
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_) const final;
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_) const final;
 
 private:
     void ConstructorDeclareStr(stringstream& ss_, const string& prefix_) const;
@@ -132,14 +108,8 @@ struct UnknowStruct : public BaseStruct
     UnknowStruct() : UnknowStruct("", "") {}
     UnknowStruct(const string& name_, const string& full_name_) : BaseStruct{name_, full_name_, MSG_TYPE::STRUCT} {}
     virtual ~UnknowStruct() = default;
-    virtual bool DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
-    {
-        return false;
-    };
-    virtual bool ImplStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const final
-    {
-        return false;
-    };
+    virtual bool DeclareStr(stringstream& ss_, const string& prefix_) const final { return false; };
+    virtual bool ImplStr(stringstream& ss_, const string& prefix_) const final { return false; };
 };
 
 struct Field
@@ -150,7 +120,7 @@ struct Field
     bool fixed_len = false;
     const BaseStruct* type_message = nullptr;
 
-    void DeclareStr(stringstream& ss_, const string& prefix_, CPP_STANDARD standard_) const;
+    void DeclareStr(stringstream& ss_, const string& prefix_) const;
 
     void SetPbStr(stringstream& ss_, const string& prefix_) const;
     void SetSingleVarStr(stringstream& ss_, const string& prefix_) const;

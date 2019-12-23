@@ -1,7 +1,7 @@
 /*
  * * file name: parser.cpp
  * * description: ...
- * * author: lemonxu
+ * * author: snow
  * * create time:2019 5月 21
  * */
 
@@ -9,7 +9,7 @@
 #include <google/protobuf/descriptor.pb.h>
 #include <cctype>
 #include <sstream>
-#include "format_conf.h"
+#include "global_var.h"
 #include "pod_options.pb.h"
 
 using google::protobuf::Descriptor;
@@ -18,6 +18,10 @@ using std::stringstream;
 
 namespace Pepper
 {
+std::string GlobalVar::message_prefix;
+std::string GlobalVar::indent;
+CPP_STANDARD GlobalVar::standard;
+
 string base_name(const string &str_)
 {
     stringstream input(str_);
@@ -97,7 +101,7 @@ void PodMessage::CollectImportMsg(const ::google::protobuf::Descriptor *desc_, c
     }
 
     std::unique_ptr<BaseMessageStruct> m(new BaseMessageStruct);
-    m->name = g_message_prefix + desc_->name();
+    m->name = GlobalVar::message_prefix + desc_->name();
     m->msg_type = MSG_TYPE::STRUCT;
 
     if (parent_)
@@ -160,11 +164,14 @@ bool PodMessage::Parse(const string &params_str_)
     if (!HasPodMessage())
         return true;
 
-    m_standard = CPP_STANDARD::CPP_11;
+    GlobalVar::standard = CPP_STANDARD::CPP_11;
     if (params_str_ == "c++98")
-        m_standard = CPP_STANDARD::CPP_98;
+        GlobalVar::standard = CPP_STANDARD::CPP_98;
     else if (params_str_ == "c++14")
-        m_standard = CPP_STANDARD::CPP_14;
+        GlobalVar::standard = CPP_STANDARD::CPP_14;
+
+    GlobalVar::message_prefix = "POD";
+    GlobalVar::indent = "    ";
 
     InitBaseMessage();
 
@@ -222,7 +229,7 @@ MessageStruct *PodMessage::ParseMessage(const Descriptor *desc_, const MessageSt
     }
 
     std::unique_ptr<MessageStruct> m(new MessageStruct);
-    m->name = g_message_prefix + desc_->name();
+    m->name = GlobalVar::message_prefix + desc_->name();
 
     auto parent_desc = desc_->containing_type();
     if ((parent_desc && !parent_) || (!parent_desc && parent_))
@@ -511,7 +518,7 @@ string PodMessage::GetHeaderDecl() const
     stringstream ss;
     ss << "namespace " << m_tree.space << "\n{\n";
     for (auto message : m_tree.root)
-        message->DeclareStr(ss, "", m_standard);
+        message->DeclareStr(ss, "");
     ss << "\n} // namespace " << m_tree.space << "\n";
     return ss.str();
 }
@@ -529,7 +536,8 @@ string PodMessage::GetSourcePrologue() const
 
 string PodMessage::GetSourceIncludeFile() const
 {
-    return string("\n#include <cstring>\n#include <string>\n#include \"") + m_base_file_name + ".pod.h\"\n\n";
+    return string("\n#include <cstring>\n#include <string>\n#include <algorithm>\n#include \"") + m_base_file_name +
+           ".pod.h\"\n\n";
 }
 
 string PodMessage::GetSourceImpl() const
@@ -537,7 +545,7 @@ string PodMessage::GetSourceImpl() const
     stringstream ss;
     ss << "namespace " << m_tree.space << "\n{\n";
     for (auto message : m_tree.root)
-        message->ImplStr(ss, "", m_standard);
+        message->ImplStr(ss, "");
     ss << "\n} // namespace " << m_tree.space << "\n";
     return ss.str();
 }
