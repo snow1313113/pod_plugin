@@ -147,25 +147,45 @@ void Field::DeclareStr(stringstream& ss_, const string& prefix_) const
         {
             ss_ << prefix_ << "static const uint8_t " << max_len_name << " = " << len << ";\n";
             if (!fixed_len)
-                ss_ << prefix_ << "uint8_t " << name << "_count;\n";
+            {
+                if (GlobalVar::standard == CPP_STANDARD::CPP_98)
+                    ss_ << prefix_ << "uint8_t " << name << "_count;\n";
+                else
+                    ss_ << prefix_ << "uint8_t " << name << "_count = 0;\n";
+            }
         }
         else if (len <= 0xFFFF)
         {
             ss_ << prefix_ << "static const uint16_t " << max_len_name << " = " << len << ";\n";
             if (!fixed_len)
-                ss_ << prefix_ << "uint16_t " << name << "_count;\n";
+            {
+                if (GlobalVar::standard == CPP_STANDARD::CPP_98)
+                    ss_ << prefix_ << "uint16_t " << name << "_count;\n";
+                else
+                    ss_ << prefix_ << "uint16_t " << name << "_count = 0;\n";
+            }
         }
         else if (len <= 0xFFFFFFFF)
         {
             ss_ << prefix_ << "static const uint32_t " << max_len_name << " = " << len << ";\n";
             if (!fixed_len)
-                ss_ << prefix_ << "uint32_t " << name << "_count;\n";
+            {
+                if (GlobalVar::standard == CPP_STANDARD::CPP_98)
+                    ss_ << prefix_ << "uint32_t " << name << "_count;\n";
+                else
+                    ss_ << prefix_ << "uint32_t " << name << "_count = 0;\n";
+            }
         }
         else
         {
             ss_ << prefix_ << "static const uint64_t " << max_len_name << " = " << len << ";\n";
             if (!fixed_len)
-                ss_ << prefix_ << "uint64_t " << name << "_count;\n";
+            {
+                if (GlobalVar::standard == CPP_STANDARD::CPP_98)
+                    ss_ << prefix_ << "uint64_t " << name << "_count;\n";
+                else
+                    ss_ << prefix_ << "uint64_t " << name << "_count = 0;\n";
+            }
         }
 
         if (GlobalVar::standard == CPP_STANDARD::CPP_98)
